@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="echarts.js"></script>
+</head>
+<body>
+<div id="main" style="width: 1000px;height: 600px"></div>
+<script>
+    function PFromC(c) {
+        var dCurP = 0,
+            dPreSuccessP = 0,
+            dPE = 0;
+        var  nMaxFail = parseInt(1.0 /c);
+        for (var i = 1; i <= nMaxFail; ++i){
+            dCurP = Math.min(1.0, i * c) * (1 - dPreSuccessP);
+            dPreSuccessP += dCurP;
+            dPE += i * dCurP;
+        }
+        return (1.0/dPE);
+    }
+    console.log(PFromC(0.025))
+    function CFromP(P) {
+        var dUp = P,
+            dLow = 0,
+            dMid = P,
+            dPLast = 1.0
+        while (true){
+            dMid = (dUp + dLow) / 2.0;
+            var dPtested = PFromC(dMid);
+            if (Math.abs(dPtested - dPLast) <= 0.0)
+                break;
+            if (dPtested > P)
+                dUp = dMid;
+            else
+                dLow = dMid;
+            dPLast = dPtested;
+        }
+        return dMid;
+    }
+    console.log(CFromP(0.25));
+    var myChart = echarts.init(document.getElementById('main'));
+    var xGrid=[],
+        slarkData=[],
+        naixData=[],
+        bloodmotherData=[],
+        s=1,
+        n=1,
+        b=1;
+    for (var i=0;i<=50;i++){
+        xGrid.push(i);
+        s=s*(1-(i*0.0022));
+        n=n*(1-(i*0.0142));
+        b=b*(1-(i*0.025));
+        slarkData.push(1-s);
+        naixData.push(1-n);
+        bloodmotherData.push(1-b);
+
+    }
+    option = {
+
+        title: {      //标题组件
+
+            text: '珍藏一'
+
+        },
+
+        tooltip: {    //提示框组件
+
+            trigger: 'axis'
+
+        },
+
+        legend: {     //图例组件
+
+            data: ['小鱼头','金狗','蜘蛛']
+
+        },
+
+        grid: {       //直角坐标系内绘图网格
+
+            left: '3%',
+
+            right: '4%',
+
+            bottom: '3%',
+
+            containLabel: true
+
+        },
+
+        toolbox: {     //工具栏
+
+            feature: {
+
+                saveAsImage: {}
+
+            }
+
+        },
+
+        xAxis: {       //直角坐标系 grid 中的 x 轴
+
+            type: 'category',
+
+            boundaryGap: false,
+
+            data: xGrid
+
+        },
+
+        yAxis: {       //直角坐标系 grid 中的 y 轴
+
+            type: 'value',
+            max:1
+
+        },
+
+        series: [      //系列列表
+
+            {
+
+                name: '小鱼头',
+
+                type: 'line',
+
+                /*/!*stack: '总量'*!/,*/
+
+                data: slarkData
+
+            },
+            {
+
+                name: '金狗',
+
+                type: 'line',
+
+                /*stack: '总量',*/
+
+                data: naixData
+
+            },
+            {
+
+                name: '蜘蛛',
+
+                type: 'line',
+
+                /* stack: '总量',*/
+
+                data: bloodmotherData
+
+            }
+        ]
+
+    };
+
+
+
+    myChart.setOption(option);
+</script>
+</body>
+</html>
